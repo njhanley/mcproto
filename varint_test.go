@@ -25,8 +25,8 @@ var (
 		{[]byte{0xff, 0xff, 0xff, 0xff, 0x0f}, -1, 5, nil},            // negative one
 		{[]byte{0x80, 0x80, 0x80, 0x80, 0x08}, math.MinInt32, 5, nil}, // largest negative value
 		// invalid
-		{[]byte{}, 0, 5, errBufTooSmall},                                     // empty buffer
-		{[]byte{0xff}, 0, 5, errBufTooSmall},                                 // incomplete buffer
+		{[]byte{}, 0, 0, errBufTooSmall},                                     // empty buffer
+		{[]byte{0xff}, 0, 1, errBufTooSmall},                                 // incomplete buffer
 		{[]byte{0xff, 0xff, 0xff, 0xff, 0xff, 0x0f}, 0, 5, errValueTooLarge}, // value overflow
 		{[]byte{0xff, 0xff, 0xff, 0xff, 0xff}, 0, 5, errValueTooLarge},       // incomplete buffer with value overflow
 	}
@@ -45,8 +45,8 @@ var (
 		{[]byte{0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x01}, -1, 10, nil},            // negative one
 		{[]byte{0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x01}, math.MinInt64, 10, nil}, // largest negative number
 		// invalid
-		{[]byte{}, 0, 10, errBufTooSmall},     // empty buffer
-		{[]byte{0xff}, 0, 10, errBufTooSmall}, // incomplete buffer
+		{[]byte{}, 0, 0, errBufTooSmall},     // empty buffer
+		{[]byte{0xff}, 0, 1, errBufTooSmall}, // incomplete buffer
 		{[]byte{0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x01}, 0, 10, errValueTooLarge}, // value overflow
 		{[]byte{0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}, 0, 10, errValueTooLarge},       // incomplete buffer with value overflow
 	}

@@ -23,7 +23,7 @@ func getVarN(buf []byte, maxBytes int) (v uint64, n int, err error) {
 		}
 	}
 	if len(buf) < maxBytes {
-		return 0, maxBytes, errors.WithStack(errBufTooSmall)
+		return 0, len(buf), errors.WithStack(errBufTooSmall)
 	}
 	return 0, maxBytes, errors.WithStack(errValueTooLarge)
 }
@@ -48,7 +48,7 @@ func putVarN(buf []byte, v uint64, maxBytes int) (int, error) {
 		v >>= cbits
 	}
 	if len(buf) < maxBytes {
-		return maxBytes, errors.WithStack(errBufTooSmall)
+		return len(buf), errors.WithStack(errBufTooSmall)
 	}
 	return maxBytes, errors.WithStack(errValueTooLarge)
 }
