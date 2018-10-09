@@ -11,6 +11,8 @@ import (
 var (
 	errBufTooSmall   = errors.New("buf too small")
 	errValueTooLarge = errors.New("value too large")
+	errStringTooLong = errors.New("string too long")
+	errInvalidString = errors.New("string not valid UTF-8")
 )
 
 func getString(buf []byte) (s string, n int, err error) {
@@ -19,7 +21,7 @@ func getString(buf []byte) (s string, n int, err error) {
 		return s, n, err
 	}
 	if length > math.MaxInt16 {
-		return s, n, errors.New("string length too large")
+		return s, n, errors.WithStack(errStringTooLong)
 	}
 
 	if len(buf) < n+int(length) {
@@ -29,7 +31,7 @@ func getString(buf []byte) (s string, n int, err error) {
 	n += int(length)
 
 	if !utf8.ValidString(s) {
-		return s, n, errors.New("string is not valid UTF-8")
+		return s, n, errors.WithStack(errInvalidString)
 	}
 
 	return s, n, nil
@@ -38,7 +40,7 @@ func getString(buf []byte) (s string, n int, err error) {
 func putString(buf []byte, s string) (n int, err error) {
 	length := len(s)
 	if length > math.MaxInt16 {
-		return n, errors.New("string is too long")
+		return n, errors.WithStack(errStringTooLong)
 	}
 
 	m, err := putVarInt(buf, int32(length))
