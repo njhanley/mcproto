@@ -117,3 +117,43 @@ func BenchmarkPutString(b *testing.B) {
 		putString(buf, data[i%benchmarkDatums])
 	}
 }
+
+func BenchmarkGetPosition(b *testing.B) {
+	rand.Seed(benchmarkSeed)
+	data := make([][]byte, benchmarkDatums)
+	for i := range data {
+		p := position{
+			x: int32(rand.Intn(1 << 26)),
+			y: int16(rand.Intn(1 << 12)),
+			z: int32(rand.Intn(1 << 26)),
+		}
+		buf := make([]byte, positionLen)
+		if n, err := putPosition(buf, p); err != nil {
+			b.Fatalf("failed to create benchmark data: have: %#v, got: (%#v, %#v, %#v)",
+				p,
+				n, err, buf[:n])
+		}
+		data[i] = buf
+	}
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		getPosition(data[i%benchmarkDatums])
+	}
+}
+
+func BenchmarkPutPosition(b *testing.B) {
+	rand.Seed(benchmarkSeed)
+	data := make([]position, benchmarkDatums)
+	for i := range data {
+		data[i].x = int32(rand.Intn(1 << 26))
+		data[i].y = int16(rand.Intn(1 << 12))
+		data[i].z = int32(rand.Intn(1 << 26))
+	}
+	buf := make([]byte, positionLen)
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		putPosition(buf, data[i%benchmarkDatums])
+	}
+}
