@@ -3,7 +3,6 @@ package protocol
 import (
 	"encoding/binary"
 	"math"
-	"unicode/utf8"
 
 	"github.com/pkg/errors"
 )
@@ -12,7 +11,6 @@ var (
 	errBufTooSmall   = errors.New("buf too small")
 	errValueTooLarge = errors.New("value too large")
 	errStringTooLong = errors.New("string too long")
-	errInvalidString = errors.New("string not valid UTF-8")
 )
 
 func getString(buf []byte) (s string, n int, err error) {
@@ -29,10 +27,6 @@ func getString(buf []byte) (s string, n int, err error) {
 	}
 	s = string(buf[n : n+int(length)])
 	n += int(length)
-
-	if !utf8.ValidString(s) {
-		return s, n, errors.WithStack(errInvalidString)
-	}
 
 	return s, n, nil
 }

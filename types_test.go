@@ -17,10 +17,9 @@ var (
 		{[]byte{0x00}, "", 1, nil}, // empty string
 		{[]byte{0x0d, 0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x2c, 0x20, 0x77, 0x6f, 0x72, 0x6c, 0x64, 0x21}, "Hello, world!", 14, nil},    // ASCII string
 		{[]byte{0x0e, 0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x2c, 0x20, 0xe4, 0xb8, 0x96, 0xe7, 0x95, 0x8c, 0x21}, "Hello, 世界!", 15, nil}, // UTF-8 string
-		{[]byte{}, "", 0, errBufTooSmall},                               // empty buffer
-		{[]byte{0x01}, "", 1, errBufTooSmall},                           // incomplete buffer
-		{[]byte{0xff, 0xff, 0x02}, "", 1, errStringTooLong},             // string length > math.MaxInt16
-		{[]byte{0x03, 0xef, 0xbf, 0xbf}, "\uffff", 4, errInvalidString}, // not a character
+		{[]byte{}, "", 0, errBufTooSmall},                   // empty buffer
+		{[]byte{0x01}, "", 1, errBufTooSmall},               // incomplete buffer
+		{[]byte{0xff, 0xff, 0x02}, "", 3, errStringTooLong}, // string length > math.MaxInt16
 	}
 )
 
