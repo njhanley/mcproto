@@ -35,7 +35,7 @@ func getPacket(buf []byte) (p packet, n int, err error) {
 func putPacket(buf []byte, p packet) (n int, err error) {
 	length := lenVarInt(p.id) + len(p.data)
 	if length > math.MaxInt32 {
-		return n, errors.New("packet is too large")
+		return n, errors.WithStack(errValueTooLarge)
 	}
 
 	m, err := putVarInt(buf, int32(length))

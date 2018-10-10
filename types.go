@@ -10,7 +10,6 @@ import (
 var (
 	errBufTooSmall   = errors.New("buf too small")
 	errValueTooLarge = errors.New("value too large")
-	errStringTooLong = errors.New("string too long")
 )
 
 func getString(buf []byte) (s string, n int, err error) {
@@ -19,7 +18,7 @@ func getString(buf []byte) (s string, n int, err error) {
 		return s, n, err
 	}
 	if length > math.MaxInt16 {
-		return s, n, errors.WithStack(errStringTooLong)
+		return s, n, errors.WithStack(errValueTooLarge)
 	}
 
 	if len(buf) < n+int(length) {
@@ -34,7 +33,7 @@ func getString(buf []byte) (s string, n int, err error) {
 func putString(buf []byte, s string) (n int, err error) {
 	length := len(s)
 	if length > math.MaxInt16 {
-		return n, errors.WithStack(errStringTooLong)
+		return n, errors.WithStack(errValueTooLarge)
 	}
 
 	m, err := putVarInt(buf, int32(length))

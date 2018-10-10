@@ -19,7 +19,7 @@ var (
 		{[]byte{0x0e, 0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x2c, 0x20, 0xe4, 0xb8, 0x96, 0xe7, 0x95, 0x8c, 0x21}, "Hello, 世界!", 15, nil}, // UTF-8 string
 		{[]byte{}, "", 0, errBufTooSmall},                   // empty buffer
 		{[]byte{0x01}, "", 1, errBufTooSmall},               // incomplete buffer
-		{[]byte{0xff, 0xff, 0x02}, "", 3, errStringTooLong}, // string length > math.MaxInt16
+		{[]byte{0xff, 0xff, 0x02}, "", 3, errValueTooLarge}, // string length > math.MaxInt16
 	}
 )
 
