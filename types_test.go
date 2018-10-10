@@ -34,6 +34,9 @@ func TestGetString(t *testing.T) {
 
 func TestPutString(t *testing.T) {
 	for _, c := range stringCases {
+		if c.err != nil {
+			continue // skip invalid cases
+		}
 		buf := make([]byte, c.length)
 		n, err := putString(buf, c.value)
 		if n != c.length || errors.Cause(err) != c.err || bytes.Compare(buf[:n], c.bytes) != 0 {
