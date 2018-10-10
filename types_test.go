@@ -2,6 +2,7 @@ package protocol
 
 import (
 	"bytes"
+	"math/rand"
 	"testing"
 
 	"github.com/pkg/errors"
@@ -75,5 +76,44 @@ func TestPutPosition(t *testing.T) {
 		if n != c.length || errors.Cause(err) != c.err || bytes.Compare(buf[:n], c.bytes) != 0 {
 			t.Errorf("have: %#v, want: (%#v, %#v, %#v), got: (%#v, %#v, %#v)", c.value, c.length, c.err, c.bytes, n, err, buf[:n])
 		}
+	}
+}
+
+const benchmarkMaxStringLen = 256
+
+func BenchmarkGetString(b *testing.B) {
+	rand.Seed(benchmarkSeed)
+	data := make([][]byte, benchmarkDatums)
+	for i := range data {
+		length := rand.Intn(benchmarkMaxStringLen)
+		buf := make([]byte, lenVarInt(int32(length))+length)
+		n, _ := putVarInt(buf, int32(length))
+		for j := range buf[n:] {
+			buf[n+j] = byte(' ' + rand.Intn(95)) // random ASCII printable character
+		}
+		data[i] = buf
+	}
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		getString(data[i%benchmarkDatums])
+	}
+}
+
+func BenchmarkPutString(b *testing.B) {
+	rand.Seed(benchmarkSeed)
+	data := make([]string, benchmarkDatums)
+	for i := range data {
+		b := make([]byte, rand.Intn(benchmarkMaxStringLen))
+		for j := range b {
+			b[j] = byte(' ' + rand.Intn(95)) // random ASCII printable character
+		}
+		data[i] = string(b)
+	}
+	buf := make([]byte, maxIntBytes+benchmarkMaxStringLen)
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		putString(buf, data[i%benchmarkDatums])
 	}
 }

@@ -133,13 +133,13 @@ func TestLenVarLong(t *testing.T) {
 }
 
 const (
-	seed   = 1
-	datums = 256
+	benchmarkSeed   = 1
+	benchmarkDatums = 256
 )
 
 func BenchmarkGetVarInt(b *testing.B) {
-	rand.Seed(seed)
-	data := make([][]byte, datums)
+	rand.Seed(benchmarkSeed)
+	data := make([][]byte, benchmarkDatums)
 	for i := range data {
 		buf := make([]byte, maxIntBytes)
 		v := int32(rand.Uint32())
@@ -154,13 +154,13 @@ func BenchmarkGetVarInt(b *testing.B) {
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		getVarInt(data[i%datums])
+		getVarInt(data[i%benchmarkDatums])
 	}
 }
 
 func BenchmarkGetVarLong(b *testing.B) {
-	rand.Seed(seed)
-	data := make([][]byte, datums)
+	rand.Seed(benchmarkSeed)
+	data := make([][]byte, benchmarkDatums)
 	for i := range data {
 		buf := make([]byte, maxLongBytes)
 		v := int64(rand.Uint64())
@@ -175,13 +175,13 @@ func BenchmarkGetVarLong(b *testing.B) {
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		getVarLong(data[i%datums])
+		getVarLong(data[i%benchmarkDatums])
 	}
 }
 
 func BenchmarkPutVarInt(b *testing.B) {
-	rand.Seed(seed)
-	data := make([]int32, datums)
+	rand.Seed(benchmarkSeed)
+	data := make([]int32, benchmarkDatums)
 	for i := range data {
 		data[i] = int32(rand.Uint32())
 	}
@@ -189,13 +189,13 @@ func BenchmarkPutVarInt(b *testing.B) {
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		putVarInt(buf, data[i%datums])
+		putVarInt(buf, data[i%benchmarkDatums])
 	}
 }
 
 func BenchmarkPutVarLong(b *testing.B) {
-	rand.Seed(seed)
-	data := make([]int64, datums)
+	rand.Seed(benchmarkSeed)
+	data := make([]int64, benchmarkDatums)
 	for i := range data {
 		data[i] = int64(rand.Uint64())
 	}
@@ -203,32 +203,32 @@ func BenchmarkPutVarLong(b *testing.B) {
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		putVarLong(buf, data[i%datums])
+		putVarLong(buf, data[i%benchmarkDatums])
 	}
 }
 
 func BenchmarkLenVarInt(b *testing.B) {
-	rand.Seed(seed)
-	data := make([]int32, datums)
+	rand.Seed(benchmarkSeed)
+	data := make([]int32, benchmarkDatums)
 	for i := range data {
 		data[i] = int32(rand.Uint32())
 	}
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		lenVarInt(data[i%datums])
+		lenVarInt(data[i%benchmarkDatums])
 	}
 }
 
 func BenchmarkLenVarLong(b *testing.B) {
-	rand.Seed(seed)
-	data := make([]int64, datums)
+	rand.Seed(benchmarkSeed)
+	data := make([]int64, benchmarkDatums)
 	for i := range data {
 		data[i] = int64(rand.Uint64())
 	}
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		lenVarLong(data[i%datums])
+		lenVarLong(data[i%benchmarkDatums])
 	}
 }
