@@ -29,7 +29,7 @@ func TestGetPacket(t *testing.T) {
 	for _, c := range packetCases {
 		p, n, err := getPacket(c.bytes)
 		if !reflect.DeepEqual(p, c.value) || n != c.length || errors.Cause(err) != c.err {
-			t.Errorf("have: [% #x], want: (%v, %d, %v), got: (%v, %d, %v)", c.bytes, c.value, c.length, c.err, p, n, err)
+			t.Errorf("have: %#v, want: (%#v, %#v, %#v), got: (%#v, %#v, %#v)", c.bytes, c.value, c.length, c.err, p, n, err)
 		}
 	}
 }
@@ -42,7 +42,7 @@ func TestPutPacket(t *testing.T) {
 		buf := make([]byte, c.length)
 		n, err := putPacket(buf, c.value)
 		if n != c.length || errors.Cause(err) != c.err || bytes.Compare(buf[:n], c.bytes) != 0 {
-			t.Errorf("have: %v, want: (%d, %v, [% #x]), got: (%d, %v, [% #x])", c.value, c.length, c.err, c.bytes, n, err, buf[:n])
+			t.Errorf("have: %#v, want: (%#v, %#v, %#v), got: (%#v, %#v, %#v)", c.value, c.length, c.err, c.bytes, n, err, buf[:n])
 		}
 	}
 }

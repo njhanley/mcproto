@@ -38,7 +38,7 @@ func TestGetString(t *testing.T) {
 	for _, c := range stringCases {
 		s, n, err := getString(c.bytes)
 		if s != c.value || n != c.length || errors.Cause(err) != c.err {
-			t.Errorf("have: [% #x], want: (%q, %d, %v), got: (%q, %d, %v)", c.bytes, c.value, c.length, c.err, s, n, err)
+			t.Errorf("have: %#v, want: (%#v, %#v, %#v), got: (%#v, %#v, %#v)", c.bytes, c.value, c.length, c.err, s, n, err)
 		}
 	}
 }
@@ -51,7 +51,7 @@ func TestPutString(t *testing.T) {
 		buf := make([]byte, c.length)
 		n, err := putString(buf, c.value)
 		if n != c.length || errors.Cause(err) != c.err || bytes.Compare(buf[:n], c.bytes) != 0 {
-			t.Errorf("have: %q, want: (%d, %v, [% #x]), got: (%d, %v, [% #x])", c.value, c.length, c.err, c.bytes, n, err, buf[:n])
+			t.Errorf("have: %#v, want: (%#v, %#v, %#v), got: (%#v, %#v, %#v)", c.value, c.length, c.err, c.bytes, n, err, buf[:n])
 		}
 	}
 }
@@ -60,7 +60,7 @@ func TestGetPosition(t *testing.T) {
 	for _, c := range positionCases {
 		p, n, err := getPosition(c.bytes)
 		if p != c.value || n != c.length || errors.Cause(err) != c.err {
-			t.Errorf("have: %v, want: (%v, %v, %v), got: (%v, %v, %v)", c.bytes, c.value, c.length, c.err, p, n, err)
+			t.Errorf("have: %#v, want: (%#v, %#v, %#v), got: (%#v, %#v, %#v)", c.bytes, c.value, c.length, c.err, p, n, err)
 		}
 	}
 }
@@ -73,7 +73,7 @@ func TestPutPosition(t *testing.T) {
 		buf := make([]byte, c.length)
 		n, err := putPosition(buf, c.value)
 		if n != c.length || errors.Cause(err) != c.err || bytes.Compare(buf[:n], c.bytes) != 0 {
-			t.Errorf("have: %v, want: (%v, %v, %v), got: (%v, %v, %v)", c.value, c.length, c.err, c.bytes, n, err, buf[:n])
+			t.Errorf("have: %#v, want: (%#v, %#v, %#v), got: (%#v, %#v, %#v)", c.value, c.length, c.err, c.bytes, n, err, buf[:n])
 		}
 	}
 }
