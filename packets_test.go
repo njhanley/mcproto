@@ -2,6 +2,7 @@ package protocol
 
 import (
 	"bytes"
+	"math/rand"
 	"reflect"
 	"testing"
 
@@ -44,5 +45,56 @@ func TestPutPacket(t *testing.T) {
 		if n != c.length || errors.Cause(err) != c.err || bytes.Compare(buf[:n], c.bytes) != 0 {
 			t.Errorf("have: %#v, want: (%#v, %#v, %#v), got: (%#v, %#v, %#v)", c.value, c.length, c.err, c.bytes, n, err, buf[:n])
 		}
+	}
+}
+
+const (
+	benchmarkMaxPacketID      = 256
+	benchmarkMaxPacketDataLen = 512
+)
+
+func BenchmarkGetPacket(b *testing.B) {
+	rand.Seed(benchmarkSeed)
+	data := make([][]byte, benchmarkDatums)
+	for i := range data {
+		p := packet{
+			id:   int32(rand.Intn(benchmarkMaxPacketID)),
+			data: make([]byte, rand.Intn(benchmarkMaxPacketDataLen)),
+		}
+		rand.Read(p.data)
+
+		buf := make([]byte, 2*maxIntBytes+benchmarkMaxPacketDataLen)
+		n, err := putPacket(buf, p)
+		if err != nil {
+			b.Fatalf("failed to create benchmark data: have: %#v, got: (%#v, %#v, %#v)",
+				p,
+				n, err, buf[:n])
+		}
+
+		data[i] = buf[:n]
+	}
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		getPacket(data[i%benchmarkDatums])
+	}
+}
+
+func BenchmarkPutPacket(b *testing.B) {
+	rand.Seed(benchmarkSeed)
+	data := make([]packet, benchmarkDatums)
+	for i := range data {
+		p := packet{
+			id:   int32(rand.Intn(benchmarkMaxPacketID)),
+			data: make([]byte, rand.Intn(benchmarkMaxPacketDataLen)),
+		}
+		rand.Read(p.data)
+		data[i] = p
+	}
+	buf := make([]byte, 2*maxIntBytes+benchmarkMaxPacketDataLen)
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		putPacket(buf, data[i%benchmarkDatums])
 	}
 }
