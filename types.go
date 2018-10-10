@@ -127,22 +127,22 @@ type position struct {
 	z int32 // size=26, offset=0
 }
 
-//func getField(n uint64, size, offset uint) int64 {
-//	return int64(n<<(64-(size+offset))) >> (64 - size)
-//}
+func getField(n uint64, size, offset uint) int64 {
+	return int64(n<<(64-(size+offset))) >> (64 - size)
+}
 
-//func putField(n int64, size, offset uint) uint64 {
-//	return uint64(n) << (64 - size) >> (64 - (size + offset))
-//}
+func putField(n int64, size, offset uint) uint64 {
+	return uint64(n) << (64 - size) >> (64 - (size + offset))
+}
 
 func getPosition(buf []byte) (p position, n int, err error) {
 	if len(buf) < positionLen {
 		return p, len(buf), errors.WithStack(errBufTooSmall)
 	}
 	v := binary.BigEndian.Uint64(buf)
-	p.x = int32(int64(v) >> 38)
-	p.y = int16(int64(v<<26) >> 52)
-	p.z = int32(int64(v<<38) >> 38)
+	p.x = int32(getField(v, 26, 38))
+	p.y = int16(getField(v, 12, 26))
+	p.z = int32(getField(v, 26, 0))
 	return p, positionLen, nil
 }
 
@@ -151,9 +151,9 @@ func putPosition(buf []byte, p position) (int, error) {
 		return len(buf), errors.WithStack(errBufTooSmall)
 	}
 	var v uint64
-	v |= uint64(p.x) << 38
-	v |= uint64(p.y) << 52 >> 26
-	v |= uint64(p.z) << 38 >> 38
+	v |= putField(int64(p.x), 26, 38)
+	v |= putField(int64(p.y), 12, 26)
+	v |= putField(int64(p.z), 26, 0)
 	binary.BigEndian.PutUint64(buf, v)
 	return positionLen, nil
 }
