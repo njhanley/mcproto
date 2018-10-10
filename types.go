@@ -49,6 +49,8 @@ func putString(buf []byte, s string) (n int, err error) {
 	return n, nil
 }
 
+const positionLen = 8
+
 type position struct {
 	x int32 // size=26, offset=38
 	y int16 // size=12, offset=26
@@ -64,24 +66,24 @@ type position struct {
 //}
 
 func getPosition(buf []byte) (p position, n int, err error) {
-	if len(buf) < 8 {
-		return p, 0, errors.WithStack(errBufTooSmall)
+	if len(buf) < positionLen {
+		return p, len(buf), errors.WithStack(errBufTooSmall)
 	}
 	v := binary.BigEndian.Uint64(buf)
 	p.x = int32(int64(v) >> 38)
 	p.y = int16(int64(v<<26) >> 52)
 	p.z = int32(int64(v<<38) >> 38)
-	return p, 8, nil
+	return p, positionLen, nil
 }
 
 func putPosition(buf []byte, p position) (int, error) {
-	if len(buf) < 8 {
-		return 0, errors.WithStack(errBufTooSmall)
+	if len(buf) < positionLen {
+		return len(buf), errors.WithStack(errBufTooSmall)
 	}
 	var v uint64
 	v |= uint64(p.x) << 38
 	v |= uint64(p.y) << 52 >> 26
 	v |= uint64(p.z) << 38 >> 38
 	binary.BigEndian.PutUint64(buf, v)
-	return 8, nil
+	return positionLen, nil
 }
