@@ -82,5 +82,6 @@ func putPosition(buf []byte, p position) (int, error) {
 	v |= uint64(p.x) << 38
 	v |= uint64(p.y) << 52 >> 26
 	v |= uint64(p.z) << 38 >> 38
+	binary.BigEndian.PutUint64(buf, v)
 	return 8, nil
 }
