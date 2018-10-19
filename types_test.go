@@ -55,7 +55,7 @@ var (
 
 func TestGetVarInt(t *testing.T) {
 	for _, c := range varIntCases {
-		v, n, err := getVarInt(c.bytes)
+		v, n, err := GetVarInt(c.bytes)
 		if v != c.value || n != c.length || errors.Cause(err) != c.err {
 			t.Errorf("have: %#v, want: (%#v, %#v, %#v), got: (%#v, %#v, %#v)",
 				c.bytes,
@@ -67,7 +67,7 @@ func TestGetVarInt(t *testing.T) {
 
 func TestGetVarLong(t *testing.T) {
 	for _, c := range varLongCases {
-		v, n, err := getVarLong(c.bytes)
+		v, n, err := GetVarLong(c.bytes)
 		if v != c.value || n != c.length || errors.Cause(err) != c.err {
 			t.Errorf("have: %#v, want: (%#v, %#v, %#v), got: (%#v, %#v, %#v)",
 				c.bytes,
@@ -83,7 +83,7 @@ func TestPutVarInt(t *testing.T) {
 		if c.err != nil {
 			continue // skip invalid cases
 		}
-		n, err := putVarInt(buf, c.value)
+		n, err := PutVarInt(buf, c.value)
 		if n != c.length || errors.Cause(err) != c.err || bytes.Compare(buf[:n], c.bytes) != 0 {
 			t.Errorf("have: %#v, want: (%#v, %#v, %#v), got: (%#v, %#v, %#v)",
 				c.value,
@@ -99,7 +99,7 @@ func TestPutVarLong(t *testing.T) {
 		if c.err != nil {
 			continue // skip invalid cases
 		}
-		n, err := putVarLong(buf, c.value)
+		n, err := PutVarLong(buf, c.value)
 		if n != c.length || errors.Cause(err) != c.err || bytes.Compare(buf[:n], c.bytes) != 0 {
 			t.Errorf("have: %#v, want: (%#v, %#v, %#v), got: (%#v, %#v, %#v)",
 				c.value,
@@ -114,7 +114,7 @@ func TestLenVarInt(t *testing.T) {
 		if c.err != nil {
 			continue // skip invalid cases
 		}
-		n := lenVarInt(c.value)
+		n := LenVarInt(c.value)
 		if n != c.length {
 			t.Errorf("have: %#v, want: %#v, got: %#v", c.value, c.length, n)
 		}
@@ -126,7 +126,7 @@ func TestLenVarLong(t *testing.T) {
 		if c.err != nil {
 			continue // skip invalid cases
 		}
-		n := lenVarLong(c.value)
+		n := LenVarLong(c.value)
 		if n != c.length {
 			t.Errorf("have: %#v, want: %#v, got: %#v", c.value, c.length, n)
 		}
@@ -144,7 +144,7 @@ func BenchmarkGetVarInt(b *testing.B) {
 	for i := range data {
 		buf := make([]byte, maxIntBytes)
 		v := int32(rand.Uint32())
-		n, err := putVarInt(buf, v)
+		n, err := PutVarInt(buf, v)
 		if err != nil {
 			b.Fatalf("failed to create benchmark data: have: %#v, got: (%#v, %#v, %#v)",
 				v,
@@ -155,7 +155,7 @@ func BenchmarkGetVarInt(b *testing.B) {
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		getVarInt(data[i%benchmarkDatums])
+		GetVarInt(data[i%benchmarkDatums])
 	}
 }
 
@@ -165,7 +165,7 @@ func BenchmarkGetVarLong(b *testing.B) {
 	for i := range data {
 		buf := make([]byte, maxLongBytes)
 		v := int64(rand.Uint64())
-		n, err := putVarLong(buf, v)
+		n, err := PutVarLong(buf, v)
 		if err != nil {
 			b.Fatalf("failed to create benchmark data: have: %#v, got: (%#v, %#v, %#v)",
 				v,
@@ -176,7 +176,7 @@ func BenchmarkGetVarLong(b *testing.B) {
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		getVarLong(data[i%benchmarkDatums])
+		GetVarLong(data[i%benchmarkDatums])
 	}
 }
 
@@ -190,7 +190,7 @@ func BenchmarkPutVarInt(b *testing.B) {
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		putVarInt(buf, data[i%benchmarkDatums])
+		PutVarInt(buf, data[i%benchmarkDatums])
 	}
 }
 
@@ -204,7 +204,7 @@ func BenchmarkPutVarLong(b *testing.B) {
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		putVarLong(buf, data[i%benchmarkDatums])
+		PutVarLong(buf, data[i%benchmarkDatums])
 	}
 }
 
@@ -217,7 +217,7 @@ func BenchmarkLenVarInt(b *testing.B) {
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		lenVarInt(data[i%benchmarkDatums])
+		LenVarInt(data[i%benchmarkDatums])
 	}
 }
 
@@ -230,7 +230,7 @@ func BenchmarkLenVarLong(b *testing.B) {
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		lenVarLong(data[i%benchmarkDatums])
+		LenVarLong(data[i%benchmarkDatums])
 	}
 }
 
@@ -250,7 +250,7 @@ var stringCases = []struct {
 
 func TestGetString(t *testing.T) {
 	for _, c := range stringCases {
-		s, n, err := getString(c.bytes)
+		s, n, err := GetString(c.bytes)
 		if s != c.value || n != c.length || errors.Cause(err) != c.err {
 			t.Errorf("have: %#v, want: (%#v, %#v, %#v), got: (%#v, %#v, %#v)", c.bytes, c.value, c.length, c.err, s, n, err)
 		}
@@ -263,7 +263,7 @@ func TestPutString(t *testing.T) {
 			continue // skip invalid cases
 		}
 		buf := make([]byte, c.length)
-		n, err := putString(buf, c.value)
+		n, err := PutString(buf, c.value)
 		if n != c.length || errors.Cause(err) != c.err || bytes.Compare(buf[:n], c.bytes) != 0 {
 			t.Errorf("have: %#v, want: (%#v, %#v, %#v), got: (%#v, %#v, %#v)", c.value, c.length, c.err, c.bytes, n, err, buf[:n])
 		}
@@ -277,8 +277,8 @@ func BenchmarkGetString(b *testing.B) {
 	data := make([][]byte, benchmarkDatums)
 	for i := range data {
 		length := rand.Intn(benchmarkMaxStringLen)
-		buf := make([]byte, lenVarInt(int32(length))+length)
-		n, _ := putVarInt(buf, int32(length))
+		buf := make([]byte, LenVarInt(int32(length))+length)
+		n, _ := PutVarInt(buf, int32(length))
 		for j := range buf[n:] {
 			buf[n+j] = byte(' ' + rand.Intn(95)) // random ASCII printable character
 		}
@@ -287,7 +287,7 @@ func BenchmarkGetString(b *testing.B) {
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		getString(data[i%benchmarkDatums])
+		GetString(data[i%benchmarkDatums])
 	}
 }
 
@@ -305,25 +305,25 @@ func BenchmarkPutString(b *testing.B) {
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		putString(buf, data[i%benchmarkDatums])
+		PutString(buf, data[i%benchmarkDatums])
 	}
 }
 
 var positionCases = []struct {
 	bytes  []byte
-	value  position
+	value  Position
 	length int
 	err    error
 }{
-	{[]byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, position{0, 0, 0}, 8, nil}, // zero value
-	{[]byte{0x00, 0x00, 0x40, 0x40, 0xab, 0xff, 0xfd, 0xff}, position{257, 42, -513}, 8, nil},
-	{[]byte{}, position{}, 0, errBufTooSmall},                                         // empty buffer
-	{[]byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, position{}, 7, errBufTooSmall}, // incomplete buffer
+	{[]byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, Position{0, 0, 0}, 8, nil}, // zero value
+	{[]byte{0x00, 0x00, 0x40, 0x40, 0xab, 0xff, 0xfd, 0xff}, Position{257, 42, -513}, 8, nil},
+	{[]byte{}, Position{}, 0, errBufTooSmall},                                         // empty buffer
+	{[]byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, Position{}, 7, errBufTooSmall}, // incomplete buffer
 }
 
 func TestGetPosition(t *testing.T) {
 	for _, c := range positionCases {
-		p, n, err := getPosition(c.bytes)
+		p, n, err := GetPosition(c.bytes)
 		if p != c.value || n != c.length || errors.Cause(err) != c.err {
 			t.Errorf("have: %#v, want: (%#v, %#v, %#v), got: (%#v, %#v, %#v)", c.bytes, c.value, c.length, c.err, p, n, err)
 		}
@@ -336,7 +336,7 @@ func TestPutPosition(t *testing.T) {
 			continue // skip invalid cases
 		}
 		buf := make([]byte, c.length)
-		n, err := putPosition(buf, c.value)
+		n, err := PutPosition(buf, c.value)
 		if n != c.length || errors.Cause(err) != c.err || bytes.Compare(buf[:n], c.bytes) != 0 {
 			t.Errorf("have: %#v, want: (%#v, %#v, %#v), got: (%#v, %#v, %#v)", c.value, c.length, c.err, c.bytes, n, err, buf[:n])
 		}
@@ -347,13 +347,13 @@ func BenchmarkGetPosition(b *testing.B) {
 	rand.Seed(benchmarkSeed)
 	data := make([][]byte, benchmarkDatums)
 	for i := range data {
-		p := position{
+		p := Position{
 			x: int32(rand.Intn(1 << 26)),
 			y: int16(rand.Intn(1 << 12)),
 			z: int32(rand.Intn(1 << 26)),
 		}
 		buf := make([]byte, positionLen)
-		if n, err := putPosition(buf, p); err != nil {
+		if n, err := PutPosition(buf, p); err != nil {
 			b.Fatalf("failed to create benchmark data: have: %#v, got: (%#v, %#v, %#v)",
 				p,
 				n, err, buf[:n])
@@ -363,13 +363,13 @@ func BenchmarkGetPosition(b *testing.B) {
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		getPosition(data[i%benchmarkDatums])
+		GetPosition(data[i%benchmarkDatums])
 	}
 }
 
 func BenchmarkPutPosition(b *testing.B) {
 	rand.Seed(benchmarkSeed)
-	data := make([]position, benchmarkDatums)
+	data := make([]Position, benchmarkDatums)
 	for i := range data {
 		data[i].x = int32(rand.Intn(1 << 26))
 		data[i].y = int16(rand.Intn(1 << 12))
@@ -379,28 +379,28 @@ func BenchmarkPutPosition(b *testing.B) {
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		putPosition(buf, data[i%benchmarkDatums])
+		PutPosition(buf, data[i%benchmarkDatums])
 	}
 }
 
 var packetCases = []struct {
 	bytes  []byte
-	value  packet
+	value  Packet
 	length int
 	err    error
 }{
-	{[]byte{0x01, 0x00}, packet{id: 0x00, data: []byte{}}, 2, nil},
-	{[]byte{0x02, 0x00, 0x00}, packet{id: 0x00, data: []byte{0x00}}, 3, nil},
-	{[]byte{0x05, 0x04, 0x03, 0x02, 0x01, 0x00}, packet{id: 0x04, data: []byte{0x03, 0x02, 0x01, 0x00}}, 6, nil},
-	{[]byte{0x02, 0x80, 0x01}, packet{id: 0x80, data: []byte{}}, 3, nil},
-	{[]byte{0x80, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, packet{id: 0x00, data: []byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}}, 130, nil},
-	{[]byte{}, packet{}, 0, errBufTooSmall},     // empty buffer
-	{[]byte{0x01}, packet{}, 1, errBufTooSmall}, // incomplete buffer
+	{[]byte{0x01, 0x00}, Packet{ID: 0x00, Data: []byte{}}, 2, nil},
+	{[]byte{0x02, 0x00, 0x00}, Packet{ID: 0x00, Data: []byte{0x00}}, 3, nil},
+	{[]byte{0x05, 0x04, 0x03, 0x02, 0x01, 0x00}, Packet{ID: 0x04, Data: []byte{0x03, 0x02, 0x01, 0x00}}, 6, nil},
+	{[]byte{0x02, 0x80, 0x01}, Packet{ID: 0x80, Data: []byte{}}, 3, nil},
+	{[]byte{0x80, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, Packet{ID: 0x00, Data: []byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}}, 130, nil},
+	{[]byte{}, Packet{}, 0, errBufTooSmall},     // empty buffer
+	{[]byte{0x01}, Packet{}, 1, errBufTooSmall}, // incomplete buffer
 }
 
 func TestGetPacket(t *testing.T) {
 	for _, c := range packetCases {
-		p, n, err := getPacket(c.bytes)
+		p, n, err := GetPacket(c.bytes)
 		if !reflect.DeepEqual(p, c.value) || n != c.length || errors.Cause(err) != c.err {
 			t.Errorf("have: %#v, want: (%#v, %#v, %#v), got: (%#v, %#v, %#v)", c.bytes, c.value, c.length, c.err, p, n, err)
 		}
@@ -413,7 +413,7 @@ func TestPutPacket(t *testing.T) {
 			continue // skip invalid cases
 		}
 		buf := make([]byte, c.length)
-		n, err := putPacket(buf, c.value)
+		n, err := PutPacket(buf, c.value)
 		if n != c.length || errors.Cause(err) != c.err || bytes.Compare(buf[:n], c.bytes) != 0 {
 			t.Errorf("have: %#v, want: (%#v, %#v, %#v), got: (%#v, %#v, %#v)", c.value, c.length, c.err, c.bytes, n, err, buf[:n])
 		}
@@ -429,14 +429,14 @@ func BenchmarkGetPacket(b *testing.B) {
 	rand.Seed(benchmarkSeed)
 	data := make([][]byte, benchmarkDatums)
 	for i := range data {
-		p := packet{
-			id:   int32(rand.Intn(benchmarkMaxPacketID)),
-			data: make([]byte, rand.Intn(benchmarkMaxPacketDataLen)),
+		p := Packet{
+			ID:   int32(rand.Intn(benchmarkMaxPacketID)),
+			Data: make([]byte, rand.Intn(benchmarkMaxPacketDataLen)),
 		}
-		rand.Read(p.data)
+		rand.Read(p.Data)
 
 		buf := make([]byte, 2*maxIntBytes+benchmarkMaxPacketDataLen)
-		n, err := putPacket(buf, p)
+		n, err := PutPacket(buf, p)
 		if err != nil {
 			b.Fatalf("failed to create benchmark data: have: %#v, got: (%#v, %#v, %#v)",
 				p,
@@ -448,25 +448,25 @@ func BenchmarkGetPacket(b *testing.B) {
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		getPacket(data[i%benchmarkDatums])
+		GetPacket(data[i%benchmarkDatums])
 	}
 }
 
 func BenchmarkPutPacket(b *testing.B) {
 	rand.Seed(benchmarkSeed)
-	data := make([]packet, benchmarkDatums)
+	data := make([]Packet, benchmarkDatums)
 	for i := range data {
-		p := packet{
-			id:   int32(rand.Intn(benchmarkMaxPacketID)),
-			data: make([]byte, rand.Intn(benchmarkMaxPacketDataLen)),
+		p := Packet{
+			ID:   int32(rand.Intn(benchmarkMaxPacketID)),
+			Data: make([]byte, rand.Intn(benchmarkMaxPacketDataLen)),
 		}
-		rand.Read(p.data)
+		rand.Read(p.Data)
 		data[i] = p
 	}
 	buf := make([]byte, 2*maxIntBytes+benchmarkMaxPacketDataLen)
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		putPacket(buf, data[i%benchmarkDatums])
+		PutPacket(buf, data[i%benchmarkDatums])
 	}
 }

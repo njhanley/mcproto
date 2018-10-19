@@ -35,12 +35,12 @@ func getVarN(buf []byte, maxBytes int) (v uint64, n int, err error) {
 	return 0, maxBytes, errors.WithStack(errValueTooLarge)
 }
 
-func getVarInt(buf []byte) (v int32, n int, err error) {
+func GetVarInt(buf []byte) (v int32, n int, err error) {
 	_v, n, err := getVarN(buf, maxIntBytes)
 	return int32(_v), n, err
 }
 
-func getVarLong(buf []byte) (v int64, n int, err error) {
+func GetVarLong(buf []byte) (v int64, n int, err error) {
 	_v, n, err := getVarN(buf, maxLongBytes)
 	return int64(_v), n, err
 }
@@ -60,12 +60,12 @@ func putVarN(buf []byte, v uint64, maxBytes int) (int, error) {
 	return maxBytes, errors.WithStack(errValueTooLarge)
 }
 
-func putVarInt(buf []byte, v int32) (int, error) {
+func PutVarInt(buf []byte, v int32) (int, error) {
 	// convert to uint32 before uint64 to avoid sign extension
 	return putVarN(buf, uint64(uint32(v)), maxIntBytes)
 }
 
-func putVarLong(buf []byte, v int64) (int, error) {
+func PutVarLong(buf []byte, v int64) (int, error) {
 	return putVarN(buf, uint64(v), maxLongBytes)
 }
 
@@ -73,17 +73,17 @@ func lenVarN(v uint64) int {
 	return 1 + ((bits.Len64(v) - 1) / cbits)
 }
 
-func lenVarInt(v int32) int {
+func LenVarInt(v int32) int {
 	// convert to uint32 before uint64 to avoid sign extension
 	return lenVarN(uint64(uint32(v)))
 }
 
-func lenVarLong(v int64) int {
+func LenVarLong(v int64) int {
 	return lenVarN(uint64(v))
 }
 
-func getString(buf []byte) (s string, n int, err error) {
-	length, m, err := getVarInt(buf)
+func GetString(buf []byte) (s string, n int, err error) {
+	length, m, err := GetVarInt(buf)
 	if n += m; err != nil {
 		return s, n, err
 	}
@@ -100,13 +100,13 @@ func getString(buf []byte) (s string, n int, err error) {
 	return s, n, nil
 }
 
-func putString(buf []byte, s string) (n int, err error) {
+func PutString(buf []byte, s string) (n int, err error) {
 	length := len(s)
 	if length > math.MaxInt16 {
 		return n, errors.WithStack(errValueTooLarge)
 	}
 
-	m, err := putVarInt(buf, int32(length))
+	m, err := PutVarInt(buf, int32(length))
 	if n += m; err != nil {
 		return n, err
 	}
@@ -121,55 +121,55 @@ func putString(buf []byte, s string) (n int, err error) {
 
 const positionLen = 8
 
-type position struct {
+type Position struct {
 	x int32 // size=26, offset=38
 	y int16 // size=12, offset=26
 	z int32 // size=26, offset=0
 }
 
-func getField(n uint64, size, offset uint) int64 {
+func GetField(n uint64, size, offset uint) int64 {
 	return int64(n<<(64-(size+offset))) >> (64 - size)
 }
 
-func putField(n int64, size, offset uint) uint64 {
+func PutField(n int64, size, offset uint) uint64 {
 	return uint64(n) << (64 - size) >> (64 - (size + offset))
 }
 
-func getPosition(buf []byte) (p position, n int, err error) {
+func GetPosition(buf []byte) (p Position, n int, err error) {
 	if len(buf) < positionLen {
 		return p, len(buf), errors.WithStack(errBufTooSmall)
 	}
 	v := binary.BigEndian.Uint64(buf)
-	p.x = int32(getField(v, 26, 38))
-	p.y = int16(getField(v, 12, 26))
-	p.z = int32(getField(v, 26, 0))
+	p.x = int32(GetField(v, 26, 38))
+	p.y = int16(GetField(v, 12, 26))
+	p.z = int32(GetField(v, 26, 0))
 	return p, positionLen, nil
 }
 
-func putPosition(buf []byte, p position) (int, error) {
+func PutPosition(buf []byte, p Position) (int, error) {
 	if len(buf) < positionLen {
 		return len(buf), errors.WithStack(errBufTooSmall)
 	}
 	var v uint64
-	v |= putField(int64(p.x), 26, 38)
-	v |= putField(int64(p.y), 12, 26)
-	v |= putField(int64(p.z), 26, 0)
+	v |= PutField(int64(p.x), 26, 38)
+	v |= PutField(int64(p.y), 12, 26)
+	v |= PutField(int64(p.z), 26, 0)
 	binary.BigEndian.PutUint64(buf, v)
 	return positionLen, nil
 }
 
-type packet struct {
-	id   int32
-	data []byte
+type Packet struct {
+	ID   int32
+	Data []byte
 }
 
-func getPacket(buf []byte) (p packet, n int, err error) {
-	length, m, err := getVarInt(buf)
+func GetPacket(buf []byte) (p Packet, n int, err error) {
+	length, m, err := GetVarInt(buf)
 	if n += m; err != nil {
 		return p, n, err
 	}
 
-	id, m, err := getVarInt(buf[n:])
+	id, m, err := GetVarInt(buf[n:])
 	if n += m; err != nil {
 		return p, n, err
 	}
@@ -181,27 +181,27 @@ func getPacket(buf []byte) (p packet, n int, err error) {
 	data := make([]byte, l)
 	n += copy(data, buf[n:n+l])
 
-	return packet{id, data}, n, nil
+	return Packet{id, data}, n, nil
 }
 
-func putPacket(buf []byte, p packet) (n int, err error) {
-	length := lenVarInt(p.id) + len(p.data)
+func PutPacket(buf []byte, p Packet) (n int, err error) {
+	length := LenVarInt(p.ID) + len(p.Data)
 	if length > math.MaxInt32 {
 		return n, errors.WithStack(errValueTooLarge)
 	}
 
-	m, err := putVarInt(buf, int32(length))
+	m, err := PutVarInt(buf, int32(length))
 	if n += m; err != nil {
 		return n, err
 	}
 
-	m, err = putVarInt(buf[n:], p.id)
+	m, err = PutVarInt(buf[n:], p.ID)
 	if n += m; err != nil {
 		return n, err
 	}
 
-	m = copy(buf[n:], p.data)
-	if n += m; m < len(p.data) {
+	m = copy(buf[n:], p.Data)
+	if n += m; m < len(p.Data) {
 		return n, errors.WithStack(errBufTooSmall)
 	}
 
